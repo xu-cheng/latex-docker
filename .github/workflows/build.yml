@@ -5,27 +5,36 @@ on:
   schedule:
     - cron: '0 0 1 * *'
 jobs:
-  build_small:
-    name: Build TeXLive [small-scheme]
+  build:
+    strategy:
+      matrix:
+        scheme: [small, full]
+    name: Build TeXLive [${{ matrix.scheme }}-scheme]
     runs-on: ubuntu-latest
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v1
       - name: Build
         run: |
-          docker build -t texlive-small --build-arg scheme=small .
+          docker build -t texlive-$SCHEME --build-arg scheme=$SCHEME .
+        env:
+          SCHEME: ${{ matrix.scheme }}
       - name: Test
         run: |
-          docker run --rm texlive-small pdflatex --version
-  build_full:
-    name: Build TeXLive [full-scheme]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Git repository
-        uses: actions/checkout@v1
-      - name: Build
+          docker run --rm texlive-$SCHEME pdflatex --version
+        env:
+          SCHEME: ${{ matrix.scheme }}
+      - name: Deploy
         run: |
-          docker build -t texlive-full --build-arg scheme=full .
-      - name: Test
-        run: |
-          docker run --rm texlive-full pdflatex --version
+          set -e
+          docker login docker.pkg.github.com -u xu-cheng -p "$GITHUB_TOKEN"
+          TAG="docker.pkg.github.com/$GITHUB_REPOSITORY/texlive-$SCHEME"
+          VERSION="$(date "+%Y%m%d")"
+          docker tag texlive-$SCHEME $TAG:$VERSION
+          docker tag texlive-$SCHEME $TAG:latest
+          docker images
+          #docker push $TAG
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCHEME: ${{ matrix.scheme }}
+        if: github.ref == 'refs/heads/master'
