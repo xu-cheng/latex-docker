@@ -11,23 +11,21 @@ jobs:
         scheme: [small, full]
     name: Build TeXLive [${{ matrix.scheme }}-scheme]
     runs-on: ubuntu-latest
+    env:
+      SCHEME: ${{ matrix.scheme }}
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v1
       - name: Build
         run: |
           docker build -t texlive-$SCHEME --build-arg scheme=$SCHEME .
-        env:
-          SCHEME: ${{ matrix.scheme }}
       - name: Test
         run: |
           docker run --rm texlive-$SCHEME pdflatex --version
-        env:
-          SCHEME: ${{ matrix.scheme }}
       - name: Deploy
         run: |
           set -e
-          docker login docker.pkg.github.com -u xu-cheng -p "$GITHUB_TOKEN"
+          docker login docker.pkg.github.com -p "$GITHUB_TOKEN"
           TAG="docker.pkg.github.com/$GITHUB_REPOSITORY/texlive-$SCHEME"
           VERSION="$(date "+%Y%m%d")"
           docker tag texlive-$SCHEME $TAG:$VERSION
@@ -36,5 +34,4 @@ jobs:
           #docker push $TAG
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SCHEME: ${{ matrix.scheme }}
         if: github.ref == 'refs/heads/master'
