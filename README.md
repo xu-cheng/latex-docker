@@ -1,6 +1,6 @@
 # latex-docker
 
-Docker image of [TeXLive](http://tug.org/texlive/).
+Docker Image of [TeXLive](http://tug.org/texlive/).
 
 ## License
 

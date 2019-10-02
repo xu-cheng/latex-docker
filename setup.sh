@@ -4,7 +4,7 @@ set -e
 
 scheme="$1"
 
-echo "==> Install Dependencies"
+echo "==> Install system packages"
 apk --no-cache add \
   ghostscript \
   gnupg \
@@ -26,8 +26,7 @@ gpg --import /texlive_pgp_keys.asc
 gpg --verify ./install-tl-unx.tar.gz.sha512.asc
 sha512sum -c ./install-tl-unx.tar.gz.sha512
 mkdir -p /tmp/install-tl/installer
-tar --strip-components 1 -zxf /tmp/install-tl/install-tl-unx.tar.gz \
-  -C /tmp/install-tl/installer
+tar --strip-components 1 -zxf /tmp/install-tl/install-tl-unx.tar.gz -C /tmp/install-tl/installer
 /tmp/install-tl/installer/install-tl -scheme "$scheme" -profile=/texlive.profile
 
 echo "==> Clean up"
