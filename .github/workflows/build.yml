@@ -30,7 +30,7 @@ jobs:
           VERSION="$(date "+%Y%m%d")"
           docker tag texlive-$SCHEME $TAG:$VERSION
           docker tag texlive-$SCHEME $TAG:latest
-          docker images
+          docker images $TAG
           docker login docker.pkg.github.com -u xu-cheng -p "$GITHUB_TOKEN"
           #docker push $TAG
         env:
