@@ -8,12 +8,19 @@ echo "==> Install system packages"
 apk --no-cache add \
   ghostscript \
   gnupg \
-  openjdk11-jre \
   perl \
   python \
   tar \
   wget \
   xz
+
+# These are only installed for full scheme
+if [ "$scheme" = "full" ]; then
+  apk --no-cache add \
+    graphviz \
+    openjdk11-jre \
+    py-pygments
+fi
 
 echo "==> Install TeXLive"
 mkdir -p /tmp/install-tl
@@ -28,6 +35,16 @@ sha512sum -c ./install-tl-unx.tar.gz.sha512
 mkdir -p /tmp/install-tl/installer
 tar --strip-components 1 -zxf /tmp/install-tl/install-tl-unx.tar.gz -C /tmp/install-tl/installer
 /tmp/install-tl/installer/install-tl -scheme "$scheme" -profile=/texlive.profile
+
+# Install additional packages for non full scheme
+if [ "$scheme" != "full" ]; then
+  tlmgr install \
+    collection-fontsrecommended \
+    biber \
+    biblatex \
+    latexmk \
+    texliveonfly
+fi
 
 echo "==> Clean up"
 rm -rf \
