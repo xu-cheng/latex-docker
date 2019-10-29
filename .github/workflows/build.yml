@@ -25,7 +25,6 @@ jobs:
           docker run --rm texlive-$SCHEME pdflatex --version
       - name: Deploy
         run: |
-          set -e
           TAG="docker.pkg.github.com/xu-cheng/latex-docker/texlive-$SCHEME"
           VERSION="$(date "+%Y%m%d")"
           docker tag texlive-$SCHEME $TAG:$VERSION
