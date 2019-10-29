@@ -31,7 +31,7 @@ jobs:
           docker tag texlive-$SCHEME $TAG:$VERSION
           docker tag texlive-$SCHEME $TAG:latest
           docker images $TAG
-          docker login docker.pkg.github.com -u xu-cheng -p "$GITHUB_TOKEN"
+          echo "$GITHUB_TOKEN" | docker login --password-stdin -u xu-cheng docker.pkg.github.com
           #docker push $TAG
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
