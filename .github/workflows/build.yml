@@ -32,7 +32,7 @@ jobs:
           docker tag texlive-$SCHEME $TAG:latest
           docker images $TAG
           echo "$GITHUB_TOKEN" | docker login --password-stdin -u xu-cheng docker.pkg.github.com
-          #docker push $TAG
+          docker push $TAG
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: github.ref == 'refs/heads/master'
