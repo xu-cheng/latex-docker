@@ -19,7 +19,8 @@ if [ "$scheme" = "full" ]; then
   apk --no-cache add \
     graphviz \
     openjdk11-jre \
-    py-pygments
+    py-pygments \
+    ttf-freefont
 fi
 
 echo "==> Install TeXLive"
