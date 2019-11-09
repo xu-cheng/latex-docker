@@ -17,9 +17,15 @@ jobs:
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v1
+      - name: Enable Docker experimental features
+        run: |
+          jq '.experimental=true' /etc/docker/daemon.json > daemon.json
+          sudo mv daemon.json /etc/docker/daemon.json
+          sudo systemctl restart docker
+          docker version -f '{{.Server.Experimental}}'
       - name: Build
         run: |
-          docker build -t texlive-$SCHEME --build-arg scheme=$SCHEME .
+          docker build --squash -t texlive-$SCHEME --build-arg scheme=$SCHEME .
       - name: Test
         run: |
           docker run --rm texlive-$SCHEME pdflatex --version
