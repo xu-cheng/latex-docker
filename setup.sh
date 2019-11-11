@@ -41,6 +41,7 @@ tar --strip-components 1 -zxf /tmp/install-tl/install-tl-unx.tar.gz -C /tmp/inst
 if [ "$scheme" != "full" ]; then
   tlmgr install \
     collection-fontsrecommended \
+    collection-fontutils \
     biber \
     biblatex \
     latexmk \
