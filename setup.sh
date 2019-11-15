@@ -4,6 +4,25 @@ set -e
 
 scheme="$1"
 
+retry() {
+  retries=$1
+  shift
+
+  count=0
+  until "$@"; do
+    exit=$?
+    wait="$(echo "2^$count" | bc)"
+    count="$(echo "$count + 1" | bc)"
+    if [ "$count" -lt "$retries" ]; then
+      echo "Retry $count/$retries exited $exit, retrying in $wait seconds..."
+      sleep "$wait"
+    else
+      echo "Retry $count/$retries exited $exit, no more retries left."
+      return "$exit"
+    fi
+  done
+}
+
 echo "==> Install system packages"
 apk --no-cache add \
   ghostscript \
@@ -30,7 +49,7 @@ gpg --verify ./install-tl-unx.tar.gz.sha512.asc
 sha512sum -c ./install-tl-unx.tar.gz.sha512
 mkdir -p /tmp/install-tl/installer
 tar --strip-components 1 -zxf /tmp/install-tl/install-tl-unx.tar.gz -C /tmp/install-tl/installer
-/tmp/install-tl/installer/install-tl -scheme "$scheme" -profile=/texlive.profile
+retry 3 /tmp/install-tl/installer/install-tl -scheme "$scheme" -profile=/texlive.profile
 
 # Install additional packages for non full scheme
 if [ "$scheme" != "full" ]; then
