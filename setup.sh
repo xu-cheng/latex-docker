@@ -8,20 +8,15 @@ echo "==> Install system packages"
 apk --no-cache add \
   ghostscript \
   gnupg \
+  graphviz \
+  openjdk11-jre \
   perl \
+  py-pygments \
   python \
   tar \
+  ttf-freefont \
   wget \
   xz
-
-# These are only installed for full scheme
-if [ "$scheme" = "full" ]; then
-  apk --no-cache add \
-    graphviz \
-    openjdk11-jre \
-    py-pygments \
-    ttf-freefont
-fi
 
 echo "==> Install TeXLive"
 mkdir -p /tmp/install-tl
