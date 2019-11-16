@@ -42,7 +42,7 @@ jobs:
           echo "$DOCKER_HUB_TOKEN" | docker login --password-stdin -u xucheng
           echo "$GITHUB_TOKEN" | docker login --password-stdin -u xu-cheng docker.pkg.github.com
           docker push $DOCKER_TAG
-          docker push $GH_TAG
+          docker push $GH_TAG || [[ "$SCHEME" = full ]] # push large image to GH failed
         env:
           DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
