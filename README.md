@@ -4,6 +4,11 @@
 
 Docker Image of [TeXLive](http://tug.org/texlive/).
 
+## See Also
+
+* [latex-action](https://github.com/xu-cheng/latex-action): GitHub action to compile LaTeX documents.
+* [texlive-action](https://github.com/xu-cheng/texlive-action): GitHub action to run arbitrary commands in a TeXLive environment.
+
 ## License
 
 MIT
