@@ -44,8 +44,8 @@ MIRROR_URL="$(wget -q -S -O /dev/null http://mirror.ctan.org/ 2>&1 | sed -ne 's/
 wget -nv "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz"
 wget -nv "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512"
 wget -nv "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512.asc"
-gpg --import /texlive_pgp_keys.asc
-gpg --verify ./install-tl-unx.tar.gz.sha512.asc
+gpg --no-default-keyring --keyring trustedkeys.kbx --import /texlive_pgp_keys.asc
+gpgv ./install-tl-unx.tar.gz.sha512.asc ./install-tl-unx.tar.gz.sha512
 sha512sum -c ./install-tl-unx.tar.gz.sha512
 mkdir -p /tmp/install-tl/installer
 tar --strip-components 1 -zxf /tmp/install-tl/install-tl-unx.tar.gz -C /tmp/install-tl/installer
