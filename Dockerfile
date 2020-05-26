@@ -12,3 +12,5 @@ COPY \
   /
 
 RUN /setup.sh ${scheme}
+
+CMD ["/bin/bash"]
