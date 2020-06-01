@@ -29,10 +29,11 @@ apk --no-cache add \
   ghostscript \
   gnupg \
   graphviz \
-  openjdk11-jre \
+  openjdk11-jre-headless \
   perl \
   py-pygments \
-  python \
+  python2 \
+  python3 \
   tar \
   ttf-freefont \
   wget \
