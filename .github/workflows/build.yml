@@ -4,6 +4,7 @@ on:
   pull_request:
   schedule:
     - cron: '0 0 1 * *'
+  workflow_dispatch:
 jobs:
   build:
     if: "!(github.event_name == 'push' && contains(github.event.head_commit.message, '[skip ci]'))"
@@ -16,7 +17,7 @@ jobs:
       SCHEME: ${{ matrix.scheme }}
     steps:
       - name: Set up Git repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Enable Docker experimental features
         run: |
           jq '.experimental=true' /etc/docker/daemon.json > daemon.json
