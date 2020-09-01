@@ -32,19 +32,11 @@ jobs:
           docker run --rm texlive-$SCHEME pdflatex --version
       - name: Deploy
         run: |
-          DOCKER_TAG="xucheng/texlive-$SCHEME"
-          GH_TAG="docker.pkg.github.com/xu-cheng/latex-docker/texlive-$SCHEME"
+          TAG="ghcr.io/xu-cheng/texlive-$SCHEME"
           VERSION="$(date "+%Y%m%d")"
-          docker tag texlive-$SCHEME ${DOCKER_TAG}:$VERSION
-          docker tag texlive-$SCHEME ${DOCKER_TAG}:latest
-          docker tag texlive-$SCHEME ${GH_TAG}:$VERSION
-          docker tag texlive-$SCHEME ${GH_TAG}:latest
-          docker images $DOCKER_TAG
-          echo "$DOCKER_HUB_TOKEN" | docker login --password-stdin -u xucheng
-          echo "$GITHUB_TOKEN" | docker login --password-stdin -u xu-cheng docker.pkg.github.com
-          docker push $DOCKER_TAG
-          docker push $GH_TAG
-        env:
-          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          docker tag texlive-$SCHEME ${TAG}:$VERSION
+          docker tag texlive-$SCHEME ${TAG}:latest
+          docker images $TAG
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+          docker push $TAG
         if: github.ref == 'refs/heads/master'
