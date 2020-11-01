@@ -1,0 +1,23 @@
+name: Manual Release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version of the docker image to be tagged as latest"
+        required: true
+jobs:
+  manual_release:
+    strategy:
+      matrix:
+        scheme: [small, full]
+    name: Release texlive-${{ matrix.scheme }}:${{ github.event.inputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          TAG="ghcr.io/xu-cheng/texlive-${{ matrix.scheme }}"
+          VERSION="${{ github.event.inputs.version }}"
+          docker pull ${TAG}:${VERSION}
+          docker tag ${TAG}:${VERSION} ${TAG}:latest
+          docker images ${TAG}
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+          docker push ${TAG}:latest
