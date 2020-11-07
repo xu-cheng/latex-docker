@@ -64,6 +64,26 @@ if [ "$scheme" != "full" ]; then
     texliveonfly
 fi
 
+# https://latexindentpl.readthedocs.io/en/latest/appendices.html#lst-alpine-install
+# Installing incompatible latexindent perl dependencies via apk
+apk --no-cache add \
+    perl-log-log4perl \
+    perl-log-dispatch \
+    perl-namespace-autoclean \
+    perl-specio \
+    perl-unicode-linebreak
+
+# Installing remaining latexindent perl dependencies via cpan
+apk --no-cache add curl wget make
+cd /usr/local/bin && \
+    curl -L https://cpanmin.us/ -o cpanm && \
+    chmod +x cpanm
+cpanm -n App::cpanminus
+cpanm -n File::HomeDir
+cpanm -n Params::ValidationCompiler
+cpanm -n YAML::Tiny
+cpanm -n Unicode::GCString
+
 echo "==> Clean up"
 rm -rf \
   /opt/texlive/texdir/install-tl \
