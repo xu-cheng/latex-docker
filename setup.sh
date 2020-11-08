@@ -40,7 +40,7 @@ apk --no-cache add \
   perl-params-validationcompiler \
   perl-specio \
   perl-unicode-linebreak \
-  perl-yaml-tiny 
+  perl-yaml-tiny \
   py-pygments \
   python2 \
   python3 \
