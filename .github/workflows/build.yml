@@ -30,6 +30,15 @@ jobs:
       - name: Test
         run: |
           docker run --rm texlive-$SCHEME pdflatex --version
+          cat <<EOF >test.tex
+          \documentclass{article}
+          \usepackage{newtxtext}
+          \begin{document}
+          test
+          \end{document}
+          EOF
+          docker run --rm -v $(PWD):/data -w /data texlive-$SCHEME texliveonfly test.tex
+          file test.pdf | grep -q ' PDF '
       - name: Deploy
         run: |
           TAG="ghcr.io/xu-cheng/texlive-$SCHEME"
