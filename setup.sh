@@ -23,7 +23,6 @@ retry() {
   done
 }
 
-head -1 /etc/apk/repositories | sed s'/alpine\/.*$/alpine\/edge\/testing/' >> /etc/apk/repositories 
 echo "==> Install system packages"
 apk --no-cache add \
   bash \
@@ -32,15 +31,6 @@ apk --no-cache add \
   graphviz \
   openjdk11-jre-headless \
   perl \
-  perl-app-cpanminus \
-  perl-file-homedir \
-  perl-log-log4perl \
-  perl-log-dispatch \
-  perl-namespace-autoclean \
-  perl-params-validationcompiler \
-  perl-specio \
-  perl-unicode-linebreak \
-  perl-yaml-tiny \
   py-pygments \
   python2 \
   python3 \
@@ -48,6 +38,21 @@ apk --no-cache add \
   ttf-freefont \
   wget \
   xz
+
+# Dependencies needed by latexindent
+apk --no-cache add \
+  perl-app-cpanminus \
+  perl-log-log4perl \
+  perl-log-dispatch \
+  perl-namespace-autoclean \
+  perl-params-validationcompiler \
+  perl-specio \
+  perl-unicode-linebreak \
+  perl-yaml-tiny
+apk --no-cache \
+  --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  add \
+  perl-file-homedir
 
 echo "==> Install TeXLive"
 mkdir -p /tmp/install-tl
