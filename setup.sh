@@ -41,9 +41,8 @@ apk --no-cache add \
 
 # Dependencies needed by latexindent
 apk --no-cache add \
-  perl-app-cpanminus \
-  perl-log-log4perl \
   perl-log-dispatch \
+  perl-log-log4perl \
   perl-namespace-autoclean \
   perl-params-validationcompiler \
   perl-specio \
