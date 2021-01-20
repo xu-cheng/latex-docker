@@ -4,6 +4,20 @@
 
 Docker Image of [TeXLive](http://tug.org/texlive/).
 
+## To use the images
+
+* [Full TeXLive](https://github.com/users/xu-cheng/packages/container/package/texlive-full)
+
+```bash
+docker pull ghcr.io/xu-cheng/texlive-full:latest
+```
+
+* [Small TeXLive](https://github.com/users/xu-cheng/packages/container/package/texlive-small)
+
+```bash
+docker pull ghcr.io/xu-cheng/texlive-small:latest
+```
+
 ## See Also
 
 * [latex-action](https://github.com/xu-cheng/latex-action): GitHub action to compile LaTeX documents.
