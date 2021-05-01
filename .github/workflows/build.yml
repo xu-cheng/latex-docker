@@ -43,11 +43,11 @@ jobs:
         run: |
           TAG="ghcr.io/xu-cheng/texlive-$SCHEME"
           VERSION="$(date "+%Y%m%d")"
-          docker tag texlive-$SCHEME ${TAG}:$VERSION
-          docker tag texlive-$SCHEME ${TAG}:latest
+          docker tag texlive-$SCHEME $TAG:$VERSION
+          docker tag texlive-$SCHEME $TAG:latest
           docker images $TAG
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
-          docker push $TAG:$VERSIOM
+          docker push $TAG:$VERSION
           docker push $TAG:latest
         if: "github.ref == 'refs/heads/master' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')"
 
