@@ -79,6 +79,16 @@ if [ "$scheme" != "full" ]; then
     texliveonfly
 fi
 
+# Install additional fonts for full sheme
+if [ "$scheme" == "full" ]; then
+  apk --no-cache add \
+    msttcorefonts-installer \
+    fontconfig
+  update-ms-fonts
+  fc-cache -f
+  mktextfm larm1200
+fi
+
 echo "==> Clean up"
 rm -rf \
   /opt/texlive/texdir/install-tl \
