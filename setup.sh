@@ -79,6 +79,11 @@ if [ "$scheme" != "full" ]; then
     texliveonfly
 fi
 
+# System font configuration for XeTeX and LuaTeX
+# Ref: https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-330003.4.4
+ln -s /opt/texlive/texdir/texmf-var/fonts/conf/texlive-fontconfig.conf /etc/fonts/conf.d/09-texlive.conf
+fc-cache -fv
+
 echo "==> Clean up"
 rm -rf \
   /opt/texlive/texdir/install-tl \
