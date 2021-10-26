@@ -27,6 +27,7 @@ retry() {
 echo "==> Install system packages"
 apk --no-cache add \
   bash \
+  fontconfig \
   ghostscript \
   gnupg \
   graphviz \
