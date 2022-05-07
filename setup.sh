@@ -43,16 +43,10 @@ apk --no-cache add \
 
 # Dependencies needed by latexindent
 apk --no-cache add \
-  perl-log-dispatch \
-  perl-log-log4perl \
-  perl-namespace-autoclean \
-  perl-params-validationcompiler \
-  perl-specio \
   perl-unicode-linebreak \
   perl-yaml-tiny
-apk --no-cache \
+apk --no-cache add \
   --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  add \
   perl-file-homedir
 
 echo "==> Install TeXLive"
