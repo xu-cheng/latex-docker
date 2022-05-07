@@ -39,6 +39,17 @@ jobs:
           EOF
           docker run --rm -v $(pwd):/data -w /data texlive-$SCHEME texliveonfly test.tex
           file test.pdf | grep -q ' PDF '
+      - name: Test latexindent
+        run: |
+          cat <<EOF >test.tex
+          \documentclass{article}
+          \usepackage{newtxtext}
+          \begin{document}
+          test
+          \end{document}
+          EOF
+          docker run --rm -v $(pwd):/data -w /data texlive-$SCHEME latexindent test.tex
+        if: "matrix.scheme == 'full'"
       - name: Deploy
         run: |
           TAG="ghcr.io/xu-cheng/texlive-$SCHEME"
