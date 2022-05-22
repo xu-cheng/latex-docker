@@ -31,6 +31,7 @@ apk --no-cache add \
   ghostscript \
   gnupg \
   graphviz \
+  make \
   openjdk11-jre-headless \
   perl \
   py-pygments \
