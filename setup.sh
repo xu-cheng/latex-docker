@@ -35,12 +35,14 @@ apk --no-cache add \
   openjdk11-jre-headless \
   perl \
   py-pygments \
-  python2 \
   python3 \
   tar \
   ttf-freefont \
   wget \
   xz
+apk --no-cache add \
+  --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  python2
 
 # Dependencies needed by latexindent
 apk --no-cache add \
