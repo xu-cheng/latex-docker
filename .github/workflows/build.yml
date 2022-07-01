@@ -37,7 +37,7 @@ jobs:
           test
           \end{document}
           EOF
-          docker run --rm -v $(pwd):/data -w /data texlive-$SCHEME texliveonfly test.tex
+          docker run --rm -v $(pwd):/data -w /data texlive-$SCHEME python3 /opt/texlive/texdir/bin/x86_64-linuxmusl/texliveonfly test.tex
           file test.pdf | grep -q ' PDF '
       - name: Test latexindent
         run: |
