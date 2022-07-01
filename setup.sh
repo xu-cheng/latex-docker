@@ -40,9 +40,6 @@ apk --no-cache add \
   ttf-freefont \
   wget \
   xz
-apk --no-cache add \
-  --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  python2
 
 # Dependencies needed by latexindent
 apk --no-cache add \
