@@ -61,7 +61,7 @@ gpgv ./install-tl-unx.tar.gz.sha512.asc ./install-tl-unx.tar.gz.sha512
 sha512sum -c ./install-tl-unx.tar.gz.sha512
 mkdir -p /tmp/install-tl/installer
 tar --strip-components 1 -zxf /tmp/install-tl/install-tl-unx.tar.gz -C /tmp/install-tl/installer
-retry 3 /tmp/install-tl/installer/install-tl -scheme "$scheme" -profile=/texlive.profile
+retry 3 /tmp/install-tl/installer/install-tl -scheme "scheme-$scheme" -profile=/texlive.profile
 
 # Install additional packages for non full scheme
 if [ "$scheme" != "full" ]; then
