@@ -33,7 +33,7 @@ apk --no-cache add \
   git \
   graphviz \
   make \
-  openjdk11-jre-headless \
+  openjdk17-jre-headless \
   perl \
   py-pygments \
   python3 \
