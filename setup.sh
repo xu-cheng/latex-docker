@@ -27,6 +27,7 @@ retry() {
 echo "==> Install system packages"
 apk --no-cache add \
   bash \
+  curl \
   fontconfig \
   ghostscript \
   gnupg \
@@ -53,10 +54,10 @@ apk --no-cache add \
 echo "==> Install TeXLive"
 mkdir -p /tmp/install-tl
 cd /tmp/install-tl
-MIRROR_URL="$(wget -q -S -O /dev/null http://mirror.ctan.org/ 2>&1 | sed -ne 's/.*Location: \(\w*\)/\1/p' | head -n 1)"
-wget -nv "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz"
-wget -nv "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512"
-wget -nv "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512.asc"
+MIRROR_URL="$(curl -w "%{redirect_url}" -o /dev/null -s http://mirror.ctan.org/)"
+curl -OL "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz"
+curl -OL "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512"
+curl -OL "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512.asc"
 gpg --no-default-keyring --keyring trustedkeys.kbx --import /texlive_pgp_keys.asc
 gpgv ./install-tl-unx.tar.gz.sha512.asc ./install-tl-unx.tar.gz.sha512
 sha512sum -c ./install-tl-unx.tar.gz.sha512
