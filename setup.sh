@@ -30,6 +30,7 @@ apk --no-cache add \
   fontconfig \
   ghostscript \
   gnupg \
+  git \
   graphviz \
   make \
   openjdk11-jre-headless \
