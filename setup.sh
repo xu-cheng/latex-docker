@@ -46,8 +46,7 @@ apk --no-cache add \
 apk --no-cache add \
   perl-unicode-linebreak \
   perl-yaml-tiny
-apk --no-cache add \
-  --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
+apk --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing add \
   perl-file-homedir
 
 echo "==> Install TeXLive"
