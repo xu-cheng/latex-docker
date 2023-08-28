@@ -47,13 +47,13 @@ apk --no-cache add \
   perl-unicode-linebreak \
   perl-yaml-tiny
 apk --no-cache add \
-  --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
   perl-file-homedir
 
 echo "==> Install TeXLive"
 mkdir -p /tmp/install-tl
 cd /tmp/install-tl
-MIRROR_URL="$(curl -w "%{redirect_url}" -o /dev/null -s http://mirror.ctan.org/)"
+MIRROR_URL="$(curl -w "%{redirect_url}" -o /dev/null -s https://mirror.ctan.org/)"
 curl -OL "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz"
 curl -OL "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512"
 curl -OL "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512.asc"
@@ -82,7 +82,7 @@ ln -sf /opt/texlive/texdir/texmf-dist/scripts/xindy/texindy.pl /opt/texlive/texd
 curl -OL https://sourceforge.net/projects/xindy/files/xindy-source-components/2.4/xindy-kernel-3.0.tar.gz
 tar xf xindy-kernel-3.0.tar.gz
 cd xindy-kernel-3.0/src
-apk add clisp --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+apk add clisp --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
 make
 cp -f xindy.mem /opt/texlive/texdir/bin/x86_64-linuxmusl/
 cd -
