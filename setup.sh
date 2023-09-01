@@ -52,7 +52,7 @@ apk --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing a
 echo "==> Install TeXLive"
 mkdir -p /tmp/install-tl
 cd /tmp/install-tl
-MIRROR_URL="$(curl -w "%{redirect_url}" -o /dev/null https://mirror.ctan.org/ || echo "https://tug.ctan.org/")"
+MIRROR_URL="$(curl -w "%{redirect_url}" -o /dev/null https://mirror.ctan.org/)"
 curl -OL "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz"
 curl -OL "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512"
 curl -OL "${MIRROR_URL}systems/texlive/tlnet/install-tl-unx.tar.gz.sha512.asc"
