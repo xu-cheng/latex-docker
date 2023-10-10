@@ -30,6 +30,7 @@ apk --no-cache add \
   fontconfig \
   ghostscript \
   gnupg \
+  gnuplot \
   git \
   graphviz \
   make \
