@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: '0 0 1 * *'
   workflow_dispatch:
+    inputs:
+      deploy:
+        type: boolean
+        description: Whether to deploy the build images
 jobs:
   build:
     if: "!(github.event_name == 'push' && contains(github.event.head_commit.message, '[skip ci]'))"
@@ -60,5 +64,5 @@ jobs:
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
           docker push $TAG:$VERSION
           docker push $TAG:latest
-        if: "github.ref == 'refs/heads/master' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')"
+        if: "github.ref == 'refs/heads/master' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.deploy))"
 
