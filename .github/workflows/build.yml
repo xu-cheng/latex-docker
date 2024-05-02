@@ -38,14 +38,29 @@ jobs:
       - name: Test pdflatex
         run: |
           docker run --rm texlive-$SCHEME pdflatex --version
+          cat <<EOF >ref.bib
+          @book{knuth1997,
+            author    = {Donald E. Knuth},
+            title     = {The Art of Computer Programming},
+            volume    = {1},
+            publisher = {Addison-Wesley},
+            year      = {1997}
+          }
+          EOF
           cat <<EOF >test.tex
           \documentclass{article}
           \usepackage{newtxtext}
+          \usepackage[style=authoryear]{biblatex}
+          \addbibresource{ref.bib}
           \begin{document}
-          test
+          Test~\cite{knuth1997}.
+
+          \printbibliography
           \end{document}
           EOF
-          docker run --rm -v $(pwd):/data -w /data texlive-$SCHEME python3 /opt/texlive/texdir/bin/x86_64-linuxmusl/texliveonfly test.tex
+          docker run --rm -v "$(pwd):/data" -w /data texlive-$SCHEME \
+            python3 /opt/texlive/texdir/bin/x86_64-linuxmusl/texliveonfly \
+            -c latexmk -a "-g -pdf -halt-on-error -interaction=nonstopmode" test.tex
           file test.pdf | grep -q ' PDF '
       - name: Test latexindent
         run: |
