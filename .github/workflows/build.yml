@@ -29,11 +29,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           build-args: scheme=${{ env.SCHEME }}
           load: true
+          file: Docker.alpine
           tags: texlive-${{ env.SCHEME }}
       - name: Test pdflatex
         run: |
@@ -59,7 +60,7 @@ jobs:
           \end{document}
           EOF
           docker run --rm -v "$(pwd):/data" -w /data texlive-$SCHEME \
-            python3 /opt/texlive/texdir/bin/x86_64-linuxmusl/texliveonfly \
+            python3 /opt/texlive/bin/texliveonfly \
             -c latexmk -a "-g -pdf -halt-on-error -interaction=nonstopmode" test.tex
           file test.pdf | grep -q ' PDF '
       - name: Test latexindent
