@@ -155,6 +155,8 @@ fi
 ln -s /opt/texlive/texdir/texmf-var/fonts/conf/texlive-fontconfig.conf /etc/fonts/conf.d/09-texlive.conf
 fc-cache -fv
 
+luaotfload-tool --update
+
 echo "==> Clean up"
 rm -rf \
   /opt/texlive/texdir/install-tl \
