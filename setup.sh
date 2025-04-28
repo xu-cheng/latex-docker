@@ -106,6 +106,10 @@ elif [[ "$OS" = "Alpine" ]]; then
     perl-yaml-tiny
   apk --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing add \
     perl-file-homedir
+
+  # Dependencies needed by gnuplot
+  apk --no-cache add \
+    perl-pdf-api2
 fi
 
 echo "==> Install TeXLive"
