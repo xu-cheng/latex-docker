@@ -34,7 +34,7 @@ jobs:
           context: .
           build-args: scheme=${{ env.SCHEME }}
           load: true
-          file: Docker.alpine
+          file: Dockerfile.alpine
           tags: texlive-${{ env.SCHEME }}
       - name: Test pdflatex
         run: |
