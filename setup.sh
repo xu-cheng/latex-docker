@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-set -e
+set -eo pipefail
 
 scheme="$1"
 
@@ -13,7 +13,7 @@ retry() {
     exit=$?
     wait="$(echo "2^$count" | bc)"
     count="$(echo "$count + 1" | bc)"
-    if [ "$count" -lt "$retries" ]; then
+    if [[ "$count" -lt "$retries" ]]; then
       echo "Retry $count/$retries exited $exit, retrying in $wait seconds..."
       sleep "$wait"
     else
@@ -23,34 +23,94 @@ retry() {
   done
 }
 
-echo "==> Install system packages"
-apk --no-cache add \
-  bash \
-  curl \
-  fontconfig \
-  ghostscript \
-  gnupg \
-  gnuplot \
-  git \
-  graphviz \
-  make \
-  openjdk21-jre-headless \
-  perl \
-  py-pygments \
-  python3 \
-  tar \
-  ttf-freefont \
-  wget \
-  xz
+if [[ -f /etc/debian_version ]]; then
+  OS="Debian"
+elif [[ -f /etc/alpine-release ]]; then
+  OS="Alpine"
+else
+  echo "Unknown Linux distribution." >&2
+  exit 1
+fi
 
-# Dependencies needed by latexindent
-apk --no-cache add \
-  perl-unicode-linebreak \
-  perl-yaml-tiny
-apk --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing add \
-  perl-file-homedir
+case "$(uname -m)" in
+  x86_64)
+    if [[ "$OS" = "Debian" ]]; then
+      echo "binary_x86_64-linux 1" >>/texlive.profile
+      TEX_ARCH=x86_64-linux
+    elif [[ "$OS" = "Alpine" ]]; then
+      echo "binary_x86_64-linux 0" >>/texlive.profile
+      echo "binary_x86_64-linuxmusl 1" >>/texlive.profile
+      TEX_ARCH=x86_64-linuxmusl
+    fi
+    ;;
+
+  aarch64)
+    if [[ "$OS" = "Debian" ]]; then
+      echo "binary_aarch64-linux 1" >>/texlive.profile
+      TEX_ARCH=aarch64-linux
+    elif [[ "$OS" = "Alpine" ]]; then
+      echo "aarch64 is not supported on Alpine." >&2
+      exit 1
+    fi
+    ;;
+
+  *)
+    echo "Unknown arch: $(uname -m)" >&2
+    exit 1
+    ;;
+esac
+
+echo "==> Install system packages"
+
+if [[ "$OS" = "Debian" ]]; then
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update -y
+  apt-get upgrade -y
+  apt-get install -y --no-install-recommends --no-install-suggests \
+    curl \
+    fontconfig \
+    ghostscript \
+    git \
+    gpg \
+    gpg-agent \
+    gnuplot-nox \
+    graphviz \
+    make \
+    openjdk-17-jre-headless \
+    perl-base \
+    python3-minimal \
+    python3-pygments \
+    tar
+elif [[ "$OS" = "Alpine" ]]; then
+  apk --no-cache add \
+    curl \
+    fontconfig \
+    ghostscript \
+    gnupg \
+    gnuplot \
+    git \
+    graphviz \
+    make \
+    openjdk21-jre-headless \
+    perl \
+    py-pygments \
+    python3 \
+    tar \
+    ttf-freefont \
+    wget \
+    xz
+
+  # Dependencies needed by latexindent
+  apk --no-cache add \
+    perl-unicode-linebreak \
+    perl-yaml-tiny
+  apk --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing add \
+    perl-file-homedir
+fi
 
 echo "==> Install TeXLive"
+mkdir -p /opt/texlive/
+ln -sf "/opt/texlive/texdir/bin/$TEX_ARCH" /opt/texlive/bin
 mkdir -p /tmp/install-tl
 cd /tmp/install-tl
 MIRROR_URL="$(curl -fsS -w "%{redirect_url}" -o /dev/null https://mirror.ctan.org/)"
@@ -66,7 +126,7 @@ tar --strip-components 1 -zxf /tmp/install-tl/install-tl-unx.tar.gz -C /tmp/inst
 retry 3 /tmp/install-tl/installer/install-tl -scheme "scheme-$scheme" -profile=/texlive.profile
 
 # Install additional packages for non full scheme
-if [ "$scheme" != "full" ]; then
+if [[ "$scheme" != "full" ]]; then
   tlmgr install \
     collection-fontsrecommended \
     collection-fontutils \
@@ -77,16 +137,18 @@ if [ "$scheme" != "full" ]; then
     xindy
 fi
 
-# https://github.com/xu-cheng/latex-action/issues/32#issuecomment-626086551
-ln -sf /opt/texlive/texdir/texmf-dist/scripts/xindy/xindy.pl /opt/texlive/texdir/bin/x86_64-linuxmusl/xindy
-ln -sf /opt/texlive/texdir/texmf-dist/scripts/xindy/texindy.pl /opt/texlive/texdir/bin/x86_64-linuxmusl/texindy
-curl -OL https://sourceforge.net/projects/xindy/files/xindy-source-components/2.4/xindy-kernel-3.0.tar.gz
-tar xf xindy-kernel-3.0.tar.gz
-cd xindy-kernel-3.0/src
-apk add clisp --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
-make
-cp -f xindy.mem /opt/texlive/texdir/bin/x86_64-linuxmusl/
-cd -
+if [[ "$OS" = "Alpine" ]]; then
+  # https://github.com/xu-cheng/latex-action/issues/32#issuecomment-626086551
+  ln -sf /opt/texlive/texdir/texmf-dist/scripts/xindy/xindy.pl /opt/texlive/texdir/bin/x86_64-linuxmusl/xindy
+  ln -sf /opt/texlive/texdir/texmf-dist/scripts/xindy/texindy.pl /opt/texlive/texdir/bin/x86_64-linuxmusl/texindy
+  curl -OL https://sourceforge.net/projects/xindy/files/xindy-source-components/2.4/xindy-kernel-3.0.tar.gz
+  tar xf xindy-kernel-3.0.tar.gz
+  cd xindy-kernel-3.0/src
+  apk add clisp --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
+  make
+  cp -f xindy.mem /opt/texlive/texdir/bin/x86_64-linuxmusl/
+  cd -
+fi
 
 # System font configuration for XeTeX and LuaTeX
 # Ref: https://www.tug.org/texlive/doc/texlive-en/texlive-en.html#x1-330003.4.4
@@ -104,3 +166,8 @@ rm -rf \
   /texlive.profile \
   /texlive_pgp_keys.asc \
   /tmp/install-tl
+
+if [[ "$OS" = "Debian" ]]; then
+  apt-get autoremove -y --purge
+  apt-get clean -y
+fi

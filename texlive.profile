@@ -7,8 +7,6 @@ TEXMFSYSCONFIG /opt/texlive/texdir/texmf-config
 TEXMFVAR       /root/texlive/texmf-var
 TEXMFCONFIG    /root/texlive/texmf-config
 TEXMFHOME      /root/texmf
-binary_x86_64-linuxmusl 1
-binary_x86_64-linux 0
 instopt_adjustpath 0
 instopt_adjustrepo 1
 instopt_letter 0

@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM debian:bookworm-slim
 ARG scheme=full
 
 LABEL \
@@ -7,7 +7,7 @@ LABEL \
   org.opencontainers.image.source="https://github.com/xu-cheng/latex-docker" \
   org.opencontainers.image.licenses="MIT"
 
-ENV PATH="/opt/texlive/texdir/bin/x86_64-linuxmusl:${PATH}"
+ENV PATH="/opt/texlive/bin:${PATH}"
 
 COPY \
   LICENSE \
