@@ -32,10 +32,10 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          build-args: scheme=${{ env.SCHEME }}
-          load: true
           file: Dockerfile.alpine
+          build-args: scheme=${{ env.SCHEME }}
           tags: texlive-${{ env.SCHEME }}
+          load: true
       - name: Test pdflatex
         run: |
           docker run --rm texlive-$SCHEME pdflatex --version
@@ -85,7 +85,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: Dockerfile.alpine
           build-args: scheme=${{ env.SCHEME }}
-          push: true
           tags: ${{ env.TAG }}:${{ env.VERSION }},${{ env.TAG }}:latest
+          push: true
         if: "github.ref == 'refs/heads/master' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.deploy))"
