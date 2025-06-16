@@ -5,6 +5,7 @@ on:
       version:
         type: string
         description: The TeXLive version to be built
+        required: true
       deploy:
         type: boolean
         description: Whether to deploy the build images
