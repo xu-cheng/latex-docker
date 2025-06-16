@@ -50,6 +50,10 @@ install_deps_alpine() {
     # Dependencies needed by gnuplot
     apk --no-cache add \
         perl-pdf-api2
+
+    # Dependencies needed by xindy
+    apk --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community add \
+        clisp
 }
 
 install_deps() {

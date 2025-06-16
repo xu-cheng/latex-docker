@@ -31,7 +31,6 @@ download_installer() {
     fi
 
     mkdir -p "$TL_INSTALLER_DIR"
-    pushd "$TL_INSTALLER_DIR" || exit 1
     curl -fsSL "$url/install-tl-unx.tar.gz" -o "$TL_INSTALLER_DIR/install-tl-unx.tar.gz"
     curl -fsSL "$url/install-tl-unx.tar.gz.sha512" -o "$TL_INSTALLER_DIR/install-tl-unx.tar.gz.sha512"
     curl -fsSL "$url/install-tl-unx.tar.gz.sha512.asc" -o "$TL_INSTALLER_DIR/install-tl-unx.tar.gz.sha512.asc"
@@ -92,7 +91,6 @@ postinstall_texlive() {
         curl -fsSL https://sourceforge.net/projects/xindy/files/xindy-source-components/2.4/xindy-kernel-3.0.tar.gz \
             -o "$TL_INSTALLER_DIR/xindy.tar.gz"
         tar --strip-components 2 -zxf "$TL_INSTALLER_DIR/xindy.tar.gz" -C "$TL_INSTALLER_DIR/xindy"
-        apk --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community add clisp
         make -C "$TL_INSTALLER_DIR/xindy"
         cp -f "$TL_INSTALLER_DIR/xindy/xindy.mem" "$TL_PREFIX/texdir/bin/x86_64-linuxmusl/"
     fi
