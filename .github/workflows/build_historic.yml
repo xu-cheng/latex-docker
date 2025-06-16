@@ -1,29 +1,23 @@
-name: Build Docker Image
+name: Build Historic Docker Image
 on:
-  push:
-  pull_request:
-  schedule:
-    - cron: "0 0 1 * *"
   workflow_dispatch:
     inputs:
+      version:
+        type: string
+        description: The TeXLive version to be built
       deploy:
         type: boolean
         description: Whether to deploy the build images
 jobs:
-  build:
-    if: "!(github.event_name == 'push' && contains(github.event.head_commit.message, '[skip ci]'))"
+  build_historic:
     strategy:
       matrix:
-        scheme: [small, full]
+        os: [debian, alpine]
     name: Build TeXLive [${{ matrix.scheme }}-scheme]
     runs-on: ubuntu-latest
     env:
-      SCHEME: ${{ matrix.scheme }}
-      TAG: ghcr.io/xu-cheng/texlive-${{ matrix.scheme }}
+      OS: ${{ matrix.os }}
     steps:
-      - name: Get version
-        run: |
-          echo "VERSION=$(date "+%Y%m%d")" >> "$GITHUB_ENV"
       - name: Set up Git repository
         uses: actions/checkout@v4
       - name: Set up Docker Buildx
@@ -32,13 +26,13 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile.alpine
-          build-args: scheme=${{ env.SCHEME }}
-          tags: texlive-${{ env.SCHEME }}
+          file: Dockerfile.${{ matrix.os }}
+          build-args: version=${{ inputs.version }}
+          tags: texlive-histroic-${{ matrix.os }}
           load: true
       - name: Test pdflatex
         run: |
-          docker run --rm "texlive-$SCHEME" pdflatex --version
+          docker run --rm "texlive-histroic-$OS" pdflatex --version
           cat <<EOF >ref.bib
           @book{knuth1997,
             author    = {Donald E. Knuth},
@@ -59,9 +53,8 @@ jobs:
           \printbibliography
           \end{document}
           EOF
-          docker run --rm -v "$(pwd):/data" -w /data "texlive-$SCHEME" \
-            python3 /opt/texlive/bin/texliveonfly \
-            -c latexmk -a "-g -pdf -halt-on-error -interaction=nonstopmode" test.tex
+          docker run --rm -v "$(pwd):/data" -w /data "texlive-histroic-$OS" \
+            latexmk -g -pdf -halt-on-error -interaction=nonstopmode test.tex
           file test.pdf | grep -q ' PDF '
       - name: Test latexindent
         run: |
@@ -72,21 +65,20 @@ jobs:
           test
           \end{document}
           EOF
-          docker run --rm -v "$(pwd):/data" -w /data "texlive-$SCHEME" latexindent test.tex
-        if: "matrix.scheme == 'full'"
+          docker run --rm -v "$(pwd):/data" -w /data "texlive-histroic-$OS" latexindent test.tex
       - name: Login
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.CR_PAT }}
-        if: "github.ref == 'refs/heads/master' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.deploy))"
+        if: "inputs.deploy"
       - name: Deploy
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile.alpine
-          build-args: scheme=${{ env.SCHEME }}
-          tags: ${{ env.TAG }}:${{ env.VERSION }},${{ env.TAG }}:latest
+          file: Dockerfile.${{ matrix.os }}
+          build-args: version=${{ inputs.version }}
+          tags: ghcr.io/xu-cheng/texlive-histroic-${{ matrix.os }}:${{ inputs.version }}
           push: true
-        if: "github.ref == 'refs/heads/master' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.deploy))"
+        if: "inputs.deploy"
