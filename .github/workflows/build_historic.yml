@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [debian, alpine]
-    name: Build TeXLive [${{ matrix.scheme }}-scheme]
+    name: Build Historic TeXLive [${{ matrix.os}}]
     runs-on: ubuntu-latest
     env:
       OS: ${{ matrix.os }}
