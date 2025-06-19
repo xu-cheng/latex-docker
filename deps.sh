@@ -19,6 +19,16 @@ install_deps_debian() {
         python3-minimal \
         python3-pygments \
         tar
+
+    # Dependencies needed by latexindent
+    apt-get install -y --no-install-recommends --no-install-suggests \
+        libfile-homedir-perl \
+        libunicode-linebreak-perl \
+        libyaml-tiny-perl
+
+    # Dependencies needed by gnuplot
+    apt-get install -y --no-install-recommends --no-install-suggests \
+        libpdf-api2-perl
 }
 
 install_deps_alpine() {
