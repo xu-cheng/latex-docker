@@ -55,6 +55,7 @@ install_texlive() {
     if [[ "$TL_VERSION" != "latest" ]]; then
         args+=(-repository "$TL_HISTORIC_REPO/$TL_VERSION/tlnet-final")
     fi
+    exprot TEXLIVE_INSTALL_ENV_NOCHECK=1
     retry 3 "${args[@]}"
 }
 
