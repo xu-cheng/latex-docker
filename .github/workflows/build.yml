@@ -59,40 +59,20 @@ jobs:
       - name: Test pdflatex
         run: |
           docker run --rm ${{ matrix.name }} pdflatex --version
-          cat <<EOF >ref.bib
-          @book{knuth1997,
-            author    = {Donald E. Knuth},
-            title     = {The Art of Computer Programming},
-            volume    = {1},
-            publisher = {Addison-Wesley},
-            year      = {1997}
-          }
-          EOF
-          cat <<EOF >test.tex
-          \documentclass{article}
-          \usepackage{newtxtext}
-          \usepackage[style=authoryear]{biblatex}
-          \addbibresource{ref.bib}
-          \begin{document}
-          Test~\cite{knuth1997}.
-
-          \printbibliography
-          \end{document}
-          EOF
-          docker run --rm -v "$(pwd):/data" -w /data ${{ matrix.name }} \
-            python3 /opt/texlive/bin/texliveonfly \
-            -c latexmk -a "-g -pdf -halt-on-error -interaction=nonstopmode" test.tex
-          file test.pdf | grep -q ' PDF '
+          docker run --rm -v "$(pwd)/test:/workspace" -w /workspace ${{ matrix.name }} \
+            make test-pdflatex
+      - name: Test bibtex
+        run: |
+          docker run --rm -v "$(pwd)/test:/workspace" -w /workspace ${{ matrix.name }} \
+            make test-bibtex
+      - name: Test biblatex
+        run: |
+          docker run --rm -v "$(pwd)/test:/workspace" -w /workspace ${{ matrix.name }} \
+            make test-biblatex
       - name: Test latexindent
         run: |
-          cat <<EOF >test.tex
-          \documentclass{article}
-          \usepackage{newtxtext}
-          \begin{document}
-          test
-          \end{document}
-          EOF
-          docker run --rm -v "$(pwd):/data" -w /data ${{ matrix.name }} latexindent test.tex
+          docker run --rm -v "$(pwd)/test:/workspace" -w /workspace ${{ matrix.name }} \
+            make test-latexindent
         if: "matrix.scheme == 'full'"
       - name: Login
         uses: docker/login-action@v3
