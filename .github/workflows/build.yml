@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
   schedule:
-    - cron: "0 0 1 * *"
+    - cron: "0 0 1 */3 *"
   workflow_dispatch:
     inputs:
       deploy:
@@ -14,16 +14,35 @@ jobs:
     if: "!(github.event_name == 'push' && contains(github.event.head_commit.message, '[skip ci]'))"
     strategy:
       matrix:
-        scheme: [small, full]
-    name: Build TeXLive [${{ matrix.scheme }}-scheme]
+        include:
+          - scheme: full
+            os: alpine
+            name: texlive-alpine
+            tags: texlive-alpine,texlive-full
+          - scheme: full
+            os: debian
+            name: texlive-debian
+            tag: texlive-debian
+          - scheme: small
+            os: alpine
+            name: texlive-alpine-small
+            tags: texlive-alpine-small,texlive-small
+    name: Build TeXLive [${{ matrix.name }}]
     runs-on: ubuntu-latest
-    env:
-      SCHEME: ${{ matrix.scheme }}
-      TAG: ghcr.io/xu-cheng/texlive-${{ matrix.scheme }}
     steps:
-      - name: Get version
+      - name: Get tags
         run: |
-          echo "VERSION=$(date "+%Y%m%d")" >> "$GITHUB_ENV"
+          versions=("$(date "+%Y%m%d")" "latest")
+
+          TAGS=""
+          IFS=',' read -ra tag_array <<< "${{ matrix.tags }}"
+          for tag in "${tag_array[@]}"; do
+              for ver in "${versions[@]}"; do
+                  TAGS+="ghcr.io/xu-cheng/$tag:$ver,"
+              done
+          done
+          TAGS="${TAGS%,}" # Remove trailing comma
+          echo "TAGS=$TAGS" >>"$GITHUB_ENV"
       - name: Set up Git repository
         uses: actions/checkout@v4
       - name: Set up Docker Buildx
@@ -32,13 +51,13 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile.alpine
-          build-args: scheme=${{ env.SCHEME }}
-          tags: texlive-${{ env.SCHEME }}
+          file: Dockerfile.${{ matrix.os }}
+          build-args: scheme=${{ matrix.scheme }}
+          tags: ${{ matrix.name }}
           load: true
       - name: Test pdflatex
         run: |
-          docker run --rm "texlive-$SCHEME" pdflatex --version
+          docker run --rm {{ $matrix.name }} pdflatex --version
           cat <<EOF >ref.bib
           @book{knuth1997,
             author    = {Donald E. Knuth},
@@ -59,7 +78,7 @@ jobs:
           \printbibliography
           \end{document}
           EOF
-          docker run --rm -v "$(pwd):/data" -w /data "texlive-$SCHEME" \
+          docker run --rm -v "$(pwd):/data" -w /data ${{ matrix.name }} \
             python3 /opt/texlive/bin/texliveonfly \
             -c latexmk -a "-g -pdf -halt-on-error -interaction=nonstopmode" test.tex
           file test.pdf | grep -q ' PDF '
@@ -72,7 +91,7 @@ jobs:
           test
           \end{document}
           EOF
-          docker run --rm -v "$(pwd):/data" -w /data "texlive-$SCHEME" latexindent test.tex
+          docker run --rm -v "$(pwd):/data" -w /data ${{ matrix.name }} latexindent test.tex
         if: "matrix.scheme == 'full'"
       - name: Login
         uses: docker/login-action@v3
@@ -85,8 +104,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile.alpine
-          build-args: scheme=${{ env.SCHEME }}
-          tags: ${{ env.TAG }}:${{ env.VERSION }},${{ env.TAG }}:latest
+          file: Dockerfile.${{ matrix.os }}
+          build-args: scheme=${{ matrix.scheme }}
+          tags: ${{ env.TAGS }}
           push: true
         if: "github.ref == 'refs/heads/master' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.deploy))"
