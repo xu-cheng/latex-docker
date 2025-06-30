@@ -26,10 +26,10 @@ jobs:
             tag: ghcr.io/xu-cheng/texlive-histroic-debian
           - name: texlive-histroic-debian-arm64
             os: debian
-            platform: linux/amd64
+            platform: linux/arm64
             runs-on: ubuntu-24.04-arm
             tag: ghcr.io/xu-cheng/texlive-histroic-debian
-    name: Build Historic TeXLive [${{ matrix.name }}]
+    name: Build Historic TeXLive [${{ matrix.name }}, version=${{ inputs.version }}]
     runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Set up Git repository
