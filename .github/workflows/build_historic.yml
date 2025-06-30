@@ -13,11 +13,24 @@ jobs:
   build_historic:
     strategy:
       matrix:
-        os: [debian, alpine]
-    name: Build Historic TeXLive [${{ matrix.os}}]
-    runs-on: ubuntu-latest
-    env:
-      OS: ${{ matrix.os }}
+        include:
+          - name: texlive-histroic-alpine-amd64
+            os: alpine
+            platform: linux/amd64
+            runs-on: ubuntu-latest
+            tag: ghcr.io/xu-cheng/texlive-histroic-alpine
+          - name: texlive-histroic-debian-amd64
+            os: debian
+            platform: linux/amd64
+            runs-on: ubuntu-latest
+            tag: ghcr.io/xu-cheng/texlive-histroic-debian
+          - name: texlive-histroic-debian-arm64
+            os: debian
+            platform: linux/amd64
+            runs-on: ubuntu-24.04-arm
+            tag: ghcr.io/xu-cheng/texlive-histroic-debian
+    name: Build Historic TeXLive [${{ matrix.name }}]
+    runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v4
@@ -29,11 +42,12 @@ jobs:
           context: .
           file: Dockerfile.${{ matrix.os }}
           build-args: version=${{ inputs.version }}
-          tags: texlive-histroic-${{ matrix.os }}
+          platforms: ${{ matrix.platform }}
+          tags: ${{ matrix.name }}
           load: true
       - name: Test pdflatex
         run: |
-          docker run --rm "texlive-histroic-$OS" pdflatex --version
+          docker run --rm ${{ matrix.name }} pdflatex --version
           cat <<EOF >ref.bib
           @book{knuth1997,
             author    = {Donald E. Knuth},
@@ -54,7 +68,7 @@ jobs:
           \printbibliography
           \end{document}
           EOF
-          docker run --rm -v "$(pwd):/data" -w /data "texlive-histroic-$OS" \
+          docker run --rm -v "$(pwd):/data" -w /data ${{ matrix.name }} \
             latexmk -g -pdf -halt-on-error -interaction=nonstopmode test.tex
           file test.pdf | grep -q ' PDF '
       - name: Test latexindent
@@ -66,7 +80,7 @@ jobs:
           test
           \end{document}
           EOF
-          docker run --rm -v "$(pwd):/data" -w /data "texlive-histroic-$OS" latexindent test.tex
+          docker run --rm -v "$(pwd):/data" -w /data ${{ matrix.name }} latexindent test.tex
       - name: Login
         uses: docker/login-action@v3
         with:
@@ -74,12 +88,69 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.CR_PAT }}
         if: "inputs.deploy"
-      - name: Deploy
+      - name: Deploy Alpine
         uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile.${{ matrix.os }}
           build-args: version=${{ inputs.version }}
-          tags: ghcr.io/xu-cheng/texlive-histroic-${{ matrix.os }}:${{ inputs.version }}
+          platforms: ${{ matrix.platform }}
+          tags: ${{ matrix.tag }}:${{ inputs.version }}
           push: true
-        if: "inputs.deploy"
+        if: "inputs.deploy && matrix.os == 'alpine'"
+      - name: Deploy Debian
+        id: push_debian
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.${{ matrix.os }}
+          build-args: version=${{ inputs.version }}
+          platforms: ${{ matrix.platform }}
+          tags: ${{ matrix.tag }}:${{ inputs.version }}
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+        if: "inputs.deploy && matrix.os == 'debian'"
+      - name: Export Debian digest
+        run: |
+          mkdir -p "${{ runner.temp }}/digests"
+          digest="${{ steps.push_deiban.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+        if: "inputs.deploy && matrix.os == 'debian'"
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.name }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+        if: "inputs.deploy && matrix.os == 'debian'"
+
+  merge:
+    if: "inputs.deploy"
+    name: Merge Debian images
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    env:
+      TAG: ghcr.io/xu-cheng/texlive-histroic-debian
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-texlive-histroic-debian-*
+          merge-multiple: true
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create --tag "${{ env.TAG }}:${{ inputs.version }}" $(printf "${{ env.TAG }}@sha256:%s " *)
+      - name: Inspect images
+        run: |
+          docker buildx imagetools inspect "${{ env.TAG }}:${{ inputs.version }}"
