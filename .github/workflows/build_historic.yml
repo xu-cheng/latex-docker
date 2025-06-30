@@ -1,4 +1,4 @@
-name: Build Historic Docker Image
+name: build-historic
 on:
   workflow_dispatch:
     inputs:
