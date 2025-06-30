@@ -15,18 +15,18 @@ jobs:
     strategy:
       matrix:
         include:
-          - scheme: full
+          - name: texlive-alpine
             os: alpine
-            name: texlive-alpine
-            tags: texlive-alpine,texlive-full
-          - scheme: full
+            scheme: full
+            tags: ghcr.io/xu-cheng/texlive-alpine,ghcr.io/xu-cheng/texlive-full
+          - name: texlive-debian
             os: debian
-            name: texlive-debian
-            tag: texlive-debian
-          - scheme: small
+            scheme: full
+            tag: ghcr.io/xu-cheng/texlive-debian
+          - name: texlive-alpine-small
             os: alpine
-            name: texlive-alpine-small
-            tags: texlive-alpine-small,texlive-small
+            scheme: small
+            tags: ghcr.io/xu-cheng/texlive-alpine-small,ghcr.io/xu-cheng/texlive-small
     name: Build TeXLive [${{ matrix.name }}]
     runs-on: ubuntu-latest
     steps:
@@ -38,10 +38,11 @@ jobs:
           IFS=',' read -ra tag_array <<< "${{ matrix.tags }}"
           for tag in "${tag_array[@]}"; do
               for ver in "${versions[@]}"; do
-                  TAGS+="ghcr.io/xu-cheng/$tag:$ver,"
+                  TAGS+="$tag:$ver,"
               done
           done
           TAGS="${TAGS%,}" # Remove trailing comma
+          echo "TAGS=$TAGS"
           echo "TAGS=$TAGS" >>"$GITHUB_ENV"
       - name: Set up Git repository
         uses: actions/checkout@v4
@@ -57,7 +58,7 @@ jobs:
           load: true
       - name: Test pdflatex
         run: |
-          docker run --rm {{ $matrix.name }} pdflatex --version
+          docker run --rm ${{ matrix.name }} pdflatex --version
           cat <<EOF >ref.bib
           @book{knuth1997,
             author    = {Donald E. Knuth},
