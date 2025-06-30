@@ -22,7 +22,7 @@ jobs:
           - name: texlive-debian
             os: debian
             scheme: full
-            tag: ghcr.io/xu-cheng/texlive-debian
+            tags: ghcr.io/xu-cheng/texlive-debian
           - name: texlive-alpine-small
             os: alpine
             scheme: small
