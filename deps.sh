@@ -6,12 +6,13 @@ install_deps_debian() {
     apt-get upgrade -y
     apt-get install -y --no-install-recommends --no-install-suggests \
         curl \
+        file \
         fontconfig \
         ghostscript \
         git \
+        gnuplot-nox \
         gpg \
         gpg-agent \
-        gnuplot-nox \
         graphviz \
         make \
         openjdk-17-jre-headless \
@@ -34,11 +35,12 @@ install_deps_debian() {
 install_deps_alpine() {
     apk --no-cache add \
         curl \
+        file \
         fontconfig \
         ghostscript \
+        git \
         gnupg \
         gnuplot \
-        git \
         graphviz \
         make \
         openjdk21-jre-headless \
