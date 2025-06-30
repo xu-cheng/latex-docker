@@ -129,7 +129,7 @@ jobs:
     name: Merge Debian images
     runs-on: ubuntu-latest
     needs:
-      - build
+      - build_historic
     env:
       TAG: ghcr.io/xu-cheng/texlive-histroic-debian
     steps:
