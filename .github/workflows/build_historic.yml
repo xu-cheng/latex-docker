@@ -88,7 +88,7 @@ jobs:
           file: Dockerfile.${{ matrix.os }}
           build-args: version=${{ inputs.version }}
           platforms: ${{ matrix.platform }}
-          tags: ${{ matrix.tag }}:${{ inputs.version }}
+          tags: ${{ matrix.tag }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
         if: "inputs.deploy && matrix.os == 'debian'"
       - name: Export Debian digest
