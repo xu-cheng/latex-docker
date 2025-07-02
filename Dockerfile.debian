@@ -2,12 +2,11 @@ FROM debian:bookworm-slim
 ARG scheme=full
 ARG version=latest
 
-LABEL \
-    org.opencontainers.image.title="TeXLive" \
-    org.opencontainers.image.description="Docker Image of TeXLive" \
-    org.opencontainers.image.authors="Cheng Xu <copyright@xuc.me>" \
-    org.opencontainers.image.source="https://github.com/xu-cheng/latex-docker" \
-    org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.title="TeXLive"
+LABEL org.opencontainers.image.description="Docker Image of TeXLive"
+LABEL org.opencontainers.image.authors="Cheng Xu <copyright@xuc.me>"
+LABEL org.opencontainers.image.source="https://github.com/xu-cheng/latex-docker"
+LABEL org.opencontainers.image.licenses="MIT"
 
 ENV PATH="/opt/texlive/bin:${PATH}"
 
