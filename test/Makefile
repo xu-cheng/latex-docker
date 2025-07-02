@@ -13,7 +13,7 @@ test-biblatex:
 	file biblatex.pdf | grep -q ' PDF '
 
 test-latexindent:
-	latexindent -g=/dev/null test.tex
+	latexindent test.tex
 
 clean:
 	latexmk -C
