@@ -14,21 +14,21 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: texlive-histroic-alpine-amd64
+          - name: texlive-historic-alpine-amd64
             os: alpine
             platform: linux/amd64
             runs-on: ubuntu-latest
-            tag: ghcr.io/xu-cheng/texlive-histroic-alpine
-          - name: texlive-histroic-debian-amd64
+            tag: ghcr.io/xu-cheng/texlive-historic-alpine
+          - name: texlive-historic-debian-amd64
             os: debian
             platform: linux/amd64
             runs-on: ubuntu-latest
-            tag: ghcr.io/xu-cheng/texlive-histroic-debian
-          - name: texlive-histroic-debian-arm64
+            tag: ghcr.io/xu-cheng/texlive-historic-debian
+          - name: texlive-historic-debian-arm64
             os: debian
             platform: linux/arm64
             runs-on: ubuntu-24.04-arm
-            tag: ghcr.io/xu-cheng/texlive-histroic-debian
+            tag: ghcr.io/xu-cheng/texlive-historic-debian
     name: Build Historic TeXLive [${{ matrix.name }}, version=${{ inputs.version }}]
     runs-on: ${{ matrix.runs-on }}
     steps:
@@ -94,7 +94,7 @@ jobs:
       - name: Export Debian digest
         run: |
           mkdir -p "${{ runner.temp }}/digests"
-          digest="${{ steps.push_deiban.outputs.digest }}"
+          digest="${{ steps.push_debian.outputs.digest }}"
           touch "${{ runner.temp }}/digests/${digest#sha256:}"
         if: "inputs.deploy && matrix.os == 'debian'"
       - name: Upload digest
@@ -113,13 +113,13 @@ jobs:
     needs:
       - build_historic
     env:
-      TAG: ghcr.io/xu-cheng/texlive-histroic-debian
+      TAG: ghcr.io/xu-cheng/texlive-historic-debian
     steps:
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
           path: ${{ runner.temp }}/digests
-          pattern: digests-texlive-histroic-debian-*
+          pattern: digests-texlive-historic-debian-*
           merge-multiple: true
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
