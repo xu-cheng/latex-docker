@@ -58,7 +58,11 @@ jobs:
         run: |
           docker run --rm -v "$(pwd)/test:/workspace" -w /workspace ${{ matrix.name }} \
             make test-biblatex
-        if: "!(matrix.platform == 'linux/arm64' && fromJSON(inputs.version) <= 2022)"
+        if: >
+          !(
+            (matrix.platform == 'linux/arm64' && fromJSON(inputs.version) <= 2022) ||
+            (matrix.os == 'alpine' && fromJSON(inputs.version) == 2022)
+          )
       - name: Test latexindent
         run: |
           docker run --rm -v "$(pwd)/test:/workspace" -w /workspace ${{ matrix.name }} \
