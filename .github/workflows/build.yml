@@ -1,4 +1,8 @@
 name: build
+permissions:
+  contents: read
+  attestations: write
+  packages: write
 on:
   pull_request:
   schedule:
@@ -87,4 +91,5 @@ jobs:
           build-args: scheme=${{ matrix.scheme }}
           tags: ${{ env.TAGS }}
           push: true
+          provenance: mode=max
         if: "github.ref == 'refs/heads/master' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.deploy))"

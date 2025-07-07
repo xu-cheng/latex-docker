@@ -1,4 +1,8 @@
 name: build-historic
+permissions:
+  contents: read
+  attestations: write
+  packages: write
 on:
   workflow_dispatch:
     inputs:
@@ -83,6 +87,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           tags: ${{ matrix.tag }}:${{ inputs.version }}
           push: true
+          provenance: mode=max
         if: "inputs.deploy && matrix.os == 'alpine'"
       - name: Deploy Debian
         id: push_debian
@@ -94,6 +99,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           tags: ${{ matrix.tag }}
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          provenance: mode=max
         if: "inputs.deploy && matrix.os == 'debian'"
       - name: Export Debian digest
         run: |
