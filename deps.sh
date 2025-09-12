@@ -15,7 +15,7 @@ install_deps_debian() {
         gpg-agent \
         graphviz \
         make \
-        openjdk-17-jre-headless \
+        openjdk-25-jre-headless \
         perl-base \
         python3-minimal \
         python3-pygments \
