@@ -41,7 +41,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Build
-        uses: docker/build-push-action@v7.1.0
+        uses: docker/build-push-action@v7.2.0
         with:
           context: .
           file: Dockerfile.${{ matrix.os }}
@@ -79,7 +79,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
         if: "inputs.deploy"
       - name: Deploy Alpine
-        uses: docker/build-push-action@v7.1.0
+        uses: docker/build-push-action@v7.2.0
         with:
           context: .
           file: Dockerfile.${{ matrix.os }}
@@ -91,7 +91,7 @@ jobs:
         if: "inputs.deploy && matrix.os == 'alpine'"
       - name: Deploy Debian
         id: push_debian
-        uses: docker/build-push-action@v7.1.0
+        uses: docker/build-push-action@v7.2.0
         with:
           context: .
           file: Dockerfile.${{ matrix.os }}
