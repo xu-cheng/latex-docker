@@ -37,7 +37,7 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Set up Git repository
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Build

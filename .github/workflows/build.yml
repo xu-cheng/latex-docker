@@ -47,7 +47,7 @@ jobs:
           echo "TAGS=$TAGS"
           echo "TAGS=$TAGS" >>"$GITHUB_ENV"
       - name: Set up Git repository
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7.0.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Build
